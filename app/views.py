@@ -6,8 +6,9 @@ from models import User, ROLE_USER, ROLE_ADMIN
 
 @app.route('/')
 @app.route('/chat')
+@login_required
 def chat_room():
-    user = { 'nickname': 'Kevin' } #fake user. Will change later
+    user = g.user
     posts = [ # fake array of posts
             {
                 'author': { 'nickname': 'Katie' },
@@ -66,3 +67,8 @@ def load_user(id):
 @app.before_request
 def before_request():
     g.user = current_user
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('chat'))

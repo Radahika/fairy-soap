@@ -9,7 +9,12 @@
     <link rel="stylesheet" href="static/animate.css">
 </head>
 <body>
-    <div>FairySoap: <a href="/chat">Home</a></div>
+    <div>FairySoap: 
+        <a href="/chat">Home</a>
+        {% if g.user.is_authenticated() %}
+        | <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </div>
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
