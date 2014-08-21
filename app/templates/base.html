@@ -1,0 +1,25 @@
+<html>
+    <head>
+    {% if title %}
+    <title>{{title}} - FairySoap</title>
+    {% else %}
+    <title>FairySoap</title>
+    {% endif %}
+    <link rel="stylesheet" href="static/style.css" type="text/css"/>
+    <link rel="stylesheet" href="static/animate.css">
+</head>
+<body>
+    <div>FairySoap: <a href="/chat">Home</a></div>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message }} </li>
+    {% endfor %}
+  </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</body>
+</html>
