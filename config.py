@@ -15,3 +15,13 @@ OPENID_PROVIDERS = [
     { 'name': 'AOL', 'url': 'http://openid.aol.com/<username>' },
     { 'name': 'Flickr', 'url': 'http://www.flickr.com/<username>' },
     { 'name': 'MyOpenID', 'url': 'https://www.myopenid.com' }]
+
+#mail server settings
+MAIL_SERVER = 'localhost:5000'
+MAIL_PORT = 25
+MAIL_USERNAME = 'bob.liu1'
+MAIL_PASSWORD = '897ay4ic'
+
+#administrator list
+ADMINS = ['bob.liu1@AOL.com']
+
