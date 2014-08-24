@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="/static/animate.css" type="text/css"/>
 </head>
 <body>
-    <div>FairySoap: 
-        <a href="{{ url_for('chat') }}">Home</a>
+    <div>FairySoap:
+        <a href="{{ url_for('chat') }}">Chat</a>
+        | <a href="{{ url_for('index') }}">Post</a>
         {% if g.user.is_authenticated() %}
         | <a href="{{ url_for('user', nickname = g.user.nickname) }}">Your Profile</a>
         | <a href="{{ url_for('logout') }}">Logout</a>
