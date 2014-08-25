@@ -1,4 +1,4 @@
-#!/Users/Radhika/programming/fairy-soap/flask/bin/python
+#!/Users/Radhika/programming/fairysoap/flask/bin/python
 # EASY-INSTALL-ENTRY-SCRIPT: 'sqlalchemy-migrate==0.7.2','console_scripts','migrate-repository'
 __requires__ = 'sqlalchemy-migrate==0.7.2'
 import sys
