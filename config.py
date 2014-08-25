@@ -25,3 +25,5 @@ MAIL_PASSWORD = '897ay4ic'
 #administrator list
 ADMINS = ['bob.liu1@AOL.com']
 
+# pagination
+POSTS_PER_PAGE = 3

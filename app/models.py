@@ -26,7 +26,7 @@ class User(db.Model):
             lazy = 'dynamic')
 
     def is_authenticated(self):
-        #should return true unless the object is a user that should not be allowed to 
+        #should return true unless the object is a user that should not be allowed to
         #authenticate for some reason
         return True
 
@@ -39,7 +39,7 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        #returns a unique identifer for the user in unicode format. 
+        #returns a unique identifer for the user in unicode format.
         return unicode(self.id)
 
     @staticmethod
@@ -56,7 +56,7 @@ class User(db.Model):
 
     def avatar(self, size):
         return 'http://www.gravatar.com/avatar/' + md5(self.email).hexdigest() + '?d=monsterid&s=' + str(size)
-    
+
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
@@ -74,7 +74,6 @@ class User(db.Model):
         return Post.query.join(followers, (followers.c.followed_id == Post.user_id)).filter(followers.c.
 follower_id == self.id).order_by(Post.timestamp.desc())
 
-    
     def __repr__(self):
         return '<User %r>' % (self.nickname)
 

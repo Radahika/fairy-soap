@@ -26,10 +26,11 @@ def chat():
                 'body': 'I am going to marry Radhika!'
             }
         ]
-    return render_template("chat.html",
-            title = 'Chat',
-            user = user,
-            posts = posts)
+    return render_template('chat.html',
+        title = 'Post',
+        user = user,
+        form = form,
+        posts = posts)
 
 @app.route('/index', methods = ['GET', 'POST'])
 @app.route('/index/<int:page>', methods = ['GET', 'POST'])
@@ -45,6 +46,7 @@ def index(page = 1):
     posts = g.user.followed_posts().paginate(page, POSTS_PER_PAGE, False)
     return render_template('index.html',
         title = 'Post',
+        user = user,
         form = form,
         posts = posts)
 
@@ -182,3 +184,16 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
+
+@app.route('/openTok')
+def openTok():
+    session_properties = {OpenTokSDK.SessionProperties.p2p_preference: "disabled"}
+    session = opentok_sdk.create_session(None, session_properties)
+    url = url_for('mychat', session_id=session.session_id)
+    return redirect(url)
+
+@app.route('/<session_id>')
+def mychat (session_id):
+    token = opentok_sdk.generate_token(session_id)
+    return render_template('mychat.html', api_key = api_key,
+            session_id=session_id, token=token)
