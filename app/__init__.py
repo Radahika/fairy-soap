@@ -4,6 +4,7 @@ import os
 from flask.ext.login import LoginManager
 from flask.ext.openid import OpenID
 from config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
+from flask.ext.socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -25,6 +26,9 @@ if not app.debug:
             credentials)
     mail_handler.setLevel(logging.ERROR)
     app.logger.addHandler(mail_handler)
+
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 from app import views, models
 

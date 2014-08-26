@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm, oid
+from app import app, db, lm, oid, socketio
 from forms import LoginForm, EditForm, PostForm
 from models import User, ROLE_USER, ROLE_ADMIN, Post
 from datetime import datetime
 from config import POSTS_PER_PAGE
+from flask.ext.socketio import emit
 
 @app.route('/', methods = ['GET', 'POST'])
 @app.route('/chat', methods = ['GET', 'POST'])
@@ -185,15 +186,18 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
-@app.route('/openTok')
-def openTok():
-    session_properties = {OpenTokSDK.SessionProperties.p2p_preference: "disabled"}
-    session = opentok_sdk.create_session(None, session_properties)
-    url = url_for('mychat', session_id=session.session_id)
-    return redirect(url)
+@socketio.on('my event', namespace='/test')
+def test_message(message):
+    emit('my response', {'data': message['data']})
 
-@app.route('/<session_id>')
-def mychat (session_id):
-    token = opentok_sdk.generate_token(session_id)
-    return render_template('mychat.html', api_key = api_key,
-            session_id=session_id, token=token)
+@socketio.on('my broadcast event', namespace='/test')
+def test_message(message):
+    emit('my response', {'data': message['data']}, broadcast=True)
+
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    emit('my response', {'data': 'Connected'})
+
+@socketio.on('disconnect', namespace='/test')
+def test_disconnect():
+    print('Client disconnected')
