@@ -1,12 +1,14 @@
-<!DOCTYPE HTML>
-<html>
+<!-- Extends base.html -->
+{% extends "base.html" %}
+
+{% block content %}
 <head>
-    <title>Flask-SocketIO Test</title>
+    <title>Flask-SocketIO Chat</title>
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-            namespace = '/test'; // change to an empty string to use the global namespace
+            var namespace = '/chat'; // change to an empty string to use the global namespace
 
             // the socket.io documentation recommends sending an explicit package upon connection
             // this is specially important when using the global namespace
@@ -47,7 +49,7 @@
     </script>
 </head>
 <body>
-    <h1>Flask-SocketIO Test</h1>
+    <h1>Flask-SocketIO Chat</h1>
     <h2>Send:</h2>
     <form id="emit" method='POST' action='#'>
         <input type="text" name="emit_data" id="emit_data" placeholder="Message">
@@ -73,4 +75,4 @@
     <h2>Receive:</h2>
     <div id="log"></div>
 </body>
-</html>
+{% endblock %}

@@ -1,3 +1,6 @@
+from gevent import monkey
+monkey.patch_all()
+
 #!flask/bin/python
 from app import app, socketio
 

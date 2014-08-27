@@ -1,3 +1,8 @@
+import time
+import threading
+from threading import Thread
+from flask.ext.socketio import SocketIO, emit, join_room, leave_room
+
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, oid, socketio
@@ -5,33 +10,26 @@ from forms import LoginForm, EditForm, PostForm
 from models import User, ROLE_USER, ROLE_ADMIN, Post
 from datetime import datetime
 from config import POSTS_PER_PAGE
-from flask.ext.socketio import emit
 
-@app.route('/', methods = ['GET', 'POST'])
-@app.route('/chat', methods = ['GET', 'POST'])
+def background_thread():
+    count = 0
+    while True:
+        time.sleep(10)
+        count += 1
+        socketio.emit('my response',
+                {'data': 'Server generated event', 'count': count},
+                namespace='/chat')
+
+@app.route('/')
+@app.route('/chat')
 @login_required
 def chat():
-    form = PostForm()
-    if form.validate_on_submit():
-        post = Post(body = form.post.data, timestamp = datetime.utcnow(), author = g.user)
-        db.session.add(post)
-        db.session.commit()
-        return redirect(url_for('chat'))
-    posts = [ # fake array of posts
-            {
-                'author': { 'nickname': 'Katie' },
-                'body': 'Yeah yeah yeah!'
-            },
-            {
-                'author': { 'nickname': 'Juan' },
-                'body': 'I am going to marry Radhika!'
-            }
-        ]
-    return render_template('chat.html',
-        title = 'Post',
-        user = user,
-        form = form,
-        posts = posts)
+    thread = None
+    global thread
+    if thread is None:
+        thread = Thread(target=background_thread)
+        thread.start()
+    return render_template('chat.html')
 
 @app.route('/index', methods = ['GET', 'POST'])
 @app.route('/index/<int:page>', methods = ['GET', 'POST'])
@@ -186,18 +184,46 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
-@socketio.on('my event', namespace='/test')
-def test_message(message):
-    emit('my response', {'data': message['data']})
+@socketio.on('my broadcast event', namespace='/chat')
+def chat_message(message):
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my response',
+            {'data': message['data'], 'count': session['receive_count']})
 
-@socketio.on('my broadcast event', namespace='/test')
-def test_message(message):
-    emit('my response', {'data': message['data']}, broadcast=True)
+@socketio.on('my broadcast event', namespace='/chat')
+def chat_message(message):
+    session['receive_count'] = session.get('recieve_count', 0) + 1
+    emit('my response',
+            {'data': message['data'], 'count': session['receive_count']},
+            broadcast=True)
 
-@socketio.on('connect', namespace='/test')
-def test_connect():
-    emit('my response', {'data': 'Connected'})
+@socketio.on('join', namespace='/chat')
+def join(message):
+    join_room(message['room'])
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my response',
+            {'data': 'In rooms: ' + ', '.join(request.namespace.rooms),
+            'count': session['receive_count']})
 
-@socketio.on('disconnect', namespace='/test')
-def test_disconnect():
+@socketio.on('leave', namespace='/chat')
+def leave(message):
+    leave_room(message['room'])
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my response',
+        {'data': 'In rooms: ' + ', '.join(request.namespace.rooms),
+        'count': session['receive_count']})
+
+@socketio.on('my room event', namespace='/chat')
+def send_room_message(message):
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my response',
+            {'data': message['data'], 'count': session['receive_count']},
+            room=message['room'])
+
+@socketio.on('connect', namespace='/chat')
+def chat_connect():
+    emit('my response', {'data': 'Conected', 'count': 0})
+
+@socketio.on('disconnect', namespace='/chat')
+def chat_disconnect():
     print('Client disconnected')
